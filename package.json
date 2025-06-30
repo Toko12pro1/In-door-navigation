@@ -1,14 +1,27 @@
 {
-  "name": "vite-starter",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "name": "campus-navigator",
+  "version": "1.0.0",
+  "description": "ICT University Campus Room Navigator - Interactive room mapping and navigation system",
+  "main": "index.html",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "vite"
   },
+  "keywords": [
+    "campus",
+    "navigation",
+    "room-mapping",
+    "university",
+    "interactive-map"
+  ],
+  "author": "ICT University",
+  "license": "MIT",
   "devDependencies": {
     "vite": "^5.4.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }

@@ -1,7 +1,7 @@
 // Admin dashboard functionality
 class AdminDashboard {
-    constructor() {
-        this.analytics = window.campusNavigator?.analytics || new Analytics();
+    constructor(analytics) {
+        this.analytics = analytics;
         this.init();
     }
 
@@ -18,20 +18,7 @@ class AdminDashboard {
     }
 
     setupEventListeners() {
-        // Clear log button
-        window.clearActivityLog = () => {
-            if (confirm('Are you sure you want to clear all activity data? This action cannot be undone.')) {
-                this.analytics.clearData();
-                this.updateDashboard();
-                this.showNotification('Activity log cleared successfully', 'success');
-            }
-        };
-
-        // Export data button
-        window.exportActivityLog = () => {
-            this.analytics.exportData();
-            this.showNotification('Analytics data exported successfully', 'success');
-        };
+        // Event listeners are now handled by the main CampusNavigator class
     }
 
     updateDashboard() {
@@ -44,15 +31,22 @@ class AdminDashboard {
         const stats = this.analytics.getStats();
         const activeSessions = this.analytics.getActiveSessions();
 
-        document.getElementById('total-views').textContent = stats.totalViews.toLocaleString();
-        document.getElementById('map-interactions').textContent = stats.mapInteractions.toLocaleString();
-        document.getElementById('room-searches').textContent = stats.roomSearches.toLocaleString();
-        document.getElementById('active-sessions').textContent = activeSessions.toLocaleString();
+        const totalViewsEl = document.getElementById('total-views');
+        const mapInteractionsEl = document.getElementById('map-interactions');
+        const roomSearchesEl = document.getElementById('room-searches');
+        const activeSessionsEl = document.getElementById('active-sessions');
+
+        if (totalViewsEl) totalViewsEl.textContent = stats.totalViews.toLocaleString();
+        if (mapInteractionsEl) mapInteractionsEl.textContent = stats.mapInteractions.toLocaleString();
+        if (roomSearchesEl) roomSearchesEl.textContent = stats.roomSearches.toLocaleString();
+        if (activeSessionsEl) activeSessionsEl.textContent = activeSessions.toLocaleString();
     }
 
     updateActivityLog() {
         const recentEvents = this.analytics.getRecentEvents(20);
         const activityLog = document.getElementById('activity-log');
+
+        if (!activityLog) return;
 
         if (recentEvents.length === 0) {
             activityLog.innerHTML = '<div class="no-activity">No recent activity</div>';
@@ -108,6 +102,8 @@ class AdminDashboard {
 
     updateChart() {
         const canvas = document.getElementById('usage-chart');
+        if (!canvas) return;
+
         const ctx = canvas.getContext('2d');
         const usageData = this.analytics.getUsageData();
 
@@ -173,6 +169,19 @@ class AdminDashboard {
         ctx.fillText('Daily Activity (Last 7 Days)', canvas.width / 2, 20);
     }
 
+    clearActivityLog() {
+        if (confirm('Are you sure you want to clear all activity data? This action cannot be undone.')) {
+            this.analytics.clearData();
+            this.updateDashboard();
+            this.showNotification('Activity log cleared successfully', 'success');
+        }
+    }
+
+    exportActivityLog() {
+        this.analytics.exportData();
+        this.showNotification('Analytics data exported successfully', 'success');
+    }
+
     showNotification(message, type = 'info') {
         // Create notification element
         const notification = document.createElement('div');
@@ -217,13 +226,10 @@ class AdminDashboard {
             notification.style.opacity = '0';
             notification.style.transform = 'translateX(100%)';
             setTimeout(() => {
-                document.body.removeChild(notification);
+                if (document.body.contains(notification)) {
+                    document.body.removeChild(notification);
+                }
             }, 300);
         }, 3000);
     }
 }
-
-// Initialize admin dashboard when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.adminDashboard = new AdminDashboard();
-});
